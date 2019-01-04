@@ -1,0 +1,55 @@
+﻿@model Dvdteka.Data.Member
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Member</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+    </dl>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tip</th>
+                <th>Vrijednost</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.MemberContacts)
+            {
+            <tr>
+                <td>@Html.DisplayFor(i => item.Type)</td>
+                <td>@Html.DisplayFor(i => item.Value)</td>
+                <td>
+                    <a asp-action="Edit" asp-controller="MemberContacts" asp-route-id="@item.Id">Uredi</a>
+                    <a asp-action="Delete" asp-controller="MemberContacts" asp-route-id="@item.Id">Obriši</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
