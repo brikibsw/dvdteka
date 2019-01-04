@@ -31,7 +31,7 @@ namespace Dvdteka.Controllers
         // POST: MemberContacts/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Type,Value,MemberId")] MemberContact memberContact)
+        public async Task<IActionResult> Create([Bind("Type,Value,MemberId")] MemberContact memberContact)
         {
             if (ModelState.IsValid)
             {
@@ -51,12 +51,12 @@ namespace Dvdteka.Controllers
                 return NotFound();
             }
 
-            var memberContact = await _context.MemberContacts.FindAsync(id);
+            var memberContact = await _context.MemberContacts.Include(a => a.Member).FirstOrDefaultAsync(a => a.Id == id);
             if (memberContact == null)
             {
                 return NotFound();
             }
-            ViewData["MemberId"] = new SelectList(_context.Members, "Id", "Address", memberContact.MemberId);
+            ViewData["InfoTypes"] = ContactInfos(memberContact.Type);
             return View(memberContact);
         }
 
