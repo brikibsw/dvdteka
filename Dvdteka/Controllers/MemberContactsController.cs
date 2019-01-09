@@ -92,7 +92,7 @@ namespace Dvdteka.Controllers
                 }
                 return RedirectToAction("Index", "Members");
             }
-            ViewData["MemberId"] = new SelectList(_context.Members, "Id", "Address", memberContact.MemberId);
+            ViewData["InfoTypes"] = ContactInfos(memberContact.Type);
             return View(memberContact);
         }
 

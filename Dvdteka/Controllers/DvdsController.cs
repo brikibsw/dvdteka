@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -19,9 +17,29 @@ namespace Dvdteka.Controllers
         }
 
         // GET: Dvds
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchByName, string searchByDirector, string searchByGenre)
         {
-            var dvdtekaContext = _context.Dvds.Include(d => d.Director).Include(d => d.Genre);
+            ViewData["searchByName"] = searchByName;
+            ViewData["searchByDirector"] = searchByDirector;
+            ViewData["searchByGenre"] = searchByGenre;
+
+            var dvdtekaContext = _context.Dvds.Include(d => d.Director).Include(d => d.Genre).AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchByName))
+            {
+                dvdtekaContext = dvdtekaContext.Where(a => a.Name.ToUpper().Contains(searchByName.ToUpper()));
+            }
+
+            if (!string.IsNullOrEmpty(searchByDirector))
+            {
+                dvdtekaContext = dvdtekaContext.Where(a => a.Director.Name.ToUpper().Contains(searchByDirector.ToUpper()));
+            }
+
+            if (!string.IsNullOrEmpty(searchByGenre))
+            {
+                dvdtekaContext = dvdtekaContext.Where(a => a.Genre.Name.ToUpper().Contains(searchByGenre.ToUpper()));
+            }
+
             return View(await dvdtekaContext.ToListAsync());
         }
 
@@ -58,7 +76,7 @@ namespace Dvdteka.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Price,Year,Quantity,DirectorId,GenreId")] Dvd dvd)
+        public async Task<IActionResult> Create([Bind("Name,Price,Year,Quantity,DirectorId,GenreId")] Dvd dvd)
         {
             if (ModelState.IsValid)
             {
