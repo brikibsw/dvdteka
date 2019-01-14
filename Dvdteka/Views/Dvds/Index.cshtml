@@ -1,85 +1,192 @@
 ﻿@model IEnumerable<Dvdteka.Data.Dvd>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Dvdovi";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
 
-<form asp-action="Index" >
+<form id="searchForm" asp-action="Index">
     <div class="input-group mb-3">
         <input name="searchByName" value="@ViewBag.searchByName" type="text" class="form-control" placeholder="Tražilica po nazivu..." aria-label="Tražilica..." aria-describedby="basic-addon2">
+        <input name="searchByYear" value="@ViewBag.searchByYear" type="number" class="form-control" placeholder="Tražilica po godini..." aria-label="Tražilica po godini..." aria-describedby="basic-addon2">
         <input name="searchByDirector" value="@ViewBag.searchByDirector" type="text" class="form-control" placeholder="Tražilica po režiseru..." aria-label="Tražilica..." aria-describedby="basic-addon2">
         <input name="searchByGenre" value="@ViewBag.searchByGenre" type="text" class="form-control" placeholder="Tražilica po žanru..." aria-label="Tražilica..." aria-describedby="basic-addon2">
+        <input type="hidden" name="sortBy" value="@ViewBag.sortBy" />
+        <input type="hidden" name="sort" value="@ViewBag.sort" />
+        <input type="hidden" name="pageSize" id="pageSize" value="@ViewBag.pageSize" />
         <div class="input-group-append">
             <input type="submit" value="Traži" class="btn btn-outline-secondary" />
         </div>
     </div>
 </form>
 <br />
+<nav>
+    <ul class="pagination justify-content-end">
+
+        @for (int i = 0; i < int.Parse(ViewBag.pages.ToString()); i++)
+        {
+            <li class="page-item @((i + 1) == ViewBag.page ? "active" : "")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-page="@(i+1)"
+                   asp-route-searchByGenre="@ViewBag.searchByGenre"
+                   asp-route-searchByDirector="@ViewBag.searchByDirector"
+                   asp-route-searchByName="@ViewBag.searchByName"
+                   asp-route-searchByYear="@ViewBag.searchByYear"
+                    asp-route-pageSize="@ViewBag.searchByYear">
+                    @(i + 1)
+                </a>
+            </li>
+
+        }
+        <li>
+            <select onchange="selectChanged()" id="pageSizeSelect" name="pageSizeSelect" class="form-control" asp-items="new SelectList(new List<int> {10,20,30 }, ViewBag.pageSize);"></select>
+        </li>
+    </ul>
+</nav>
+
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @await Html.PartialAsync("_DvdTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "Name" },
+                                     { "DisplayNameFor", Html.DisplayNameFor(model => model.Name) }
+                                 })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Price)
+                @await Html.PartialAsync("_DvdTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "Price" },
+                                     { "DisplayNameFor", Html.DisplayNameFor(model => model.Price) }
+                                 })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Year)
+                @await Html.PartialAsync("_DvdTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "Year" },
+                                     { "DisplayNameFor", Html.DisplayNameFor(model => model.Year) }
+                                 })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Quantity)
+                @await Html.PartialAsync("_DvdTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "Quantity" },
+                                     { "DisplayNameFor", Html.DisplayNameFor(model => model.Quantity) }
+                                 })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AvailableQuantity)
+                @await Html.PartialAsync("_DvdTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "AvailableQuantity" },
+                                     { "DisplayNameFor", Html.DisplayNameFor(model => model.AvailableQuantity) }
+                                 })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Director)
+                @await Html.PartialAsync("_DvdTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "DirectorName" },
+                                     { "DisplayNameFor", Html.DisplayNameFor(model => model.Director) }
+                                 })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Genre)
+                @await Html.PartialAsync("_DvdTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "GenreName" },
+                                     { "DisplayNameFor", Html.DisplayNameFor(model => model.Genre) }
+                                 })
+                @*<a asp-action="Index"
+                       asp-route-page="@ViewBag.page"
+                       asp-route-searchByGenre="@ViewBag.searchByGenre"
+                       asp-route-searchByDirector="@ViewBag.searchByDirector"
+                       asp-route-searchByName="@ViewBag.searchByName"
+                       asp-route-searchByYear="@ViewBag.searchByYear"
+                       asp-route-sortBy="GenreName"
+                       asp-route-sort="@(ViewBag.sort == "asc" ? "desc" : "asc")">
+                        @Html.DisplayNameFor(model => model.Genre)
+                    </a>*@
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Year)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AvailableQuantity)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Director.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Genre.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
-                <a asp-action="Create" asp-controller="Rents" asp-route-id="@item.Id">Izdaj</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Year)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Quantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AvailableQuantity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Director.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Genre.Name)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                    <a asp-action="Create" asp-controller="Rents" asp-route-id="@item.Id">Izdaj</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+<nav>
+    <ul class="pagination justify-content-end">
+
+        @for (int i = 0; i < int.Parse(ViewBag.pages.ToString()); i++)
+        {
+            <li class="page-item @((i + 1) == ViewBag.page ? "active" : "")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-page="@(i+1)"
+                   asp-route-searchByGenre="@ViewBag.searchByGenre"
+                   asp-route-searchByDirector="@ViewBag.searchByDirector"
+                   asp-route-searchByName="@ViewBag.searchByName"
+                   asp-route-searchByYear="@ViewBag.searchByYear">
+                    @(i + 1)
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+@section Scripts {
+    
+    <script type="text/javascript">
+        function selectChanged() {
+            var s = document.getElementById("pageSizeSelect");
+            var i = document.getElementById("pageSize");
+            i.value = s.value;
+            var f = document.getElementById("searchForm");
+            f.submit();
+        }
+    </script>
+
+}

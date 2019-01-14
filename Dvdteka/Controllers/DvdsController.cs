@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Dvdteka.Data;
+using System;
 
 namespace Dvdteka.Controllers
 {
@@ -17,30 +18,83 @@ namespace Dvdteka.Controllers
         }
 
         // GET: Dvds
-        public async Task<IActionResult> Index(string searchByName, string searchByDirector, string searchByGenre)
+        public async Task<IActionResult> Index(string searchByName, string searchByDirector, string searchByGenre, int? searchByYear, string sortBy, string sort = "asc", int page = 1, int pageSize = 10)
         {
             ViewData["searchByName"] = searchByName;
             ViewData["searchByDirector"] = searchByDirector;
             ViewData["searchByGenre"] = searchByGenre;
+            ViewData["searchByYear"] = searchByYear;
 
-            var dvdtekaContext = _context.Dvds.Include(d => d.Director).Include(d => d.Genre).AsQueryable();
+            ViewData["page"] = page;
+            ViewData["pageSize"] = pageSize;
+
+            ViewData["sortBy"] = sortBy;
+            ViewData["sort"] = sort;
+
+            var dvdContext = _context.Dvds.Include(d => d.Director).Include(d => d.Genre).AsQueryable();
 
             if (!string.IsNullOrEmpty(searchByName))
             {
-                dvdtekaContext = dvdtekaContext.Where(a => a.Name.ToUpper().Contains(searchByName.ToUpper()));
+                dvdContext = dvdContext.Where(a => a.Name.ToUpper().Contains(searchByName.ToUpper()));
             }
 
             if (!string.IsNullOrEmpty(searchByDirector))
             {
-                dvdtekaContext = dvdtekaContext.Where(a => a.Director.Name.ToUpper().Contains(searchByDirector.ToUpper()));
+                dvdContext = dvdContext.Where(a => a.Director.Name.ToUpper().Contains(searchByDirector.ToUpper()));
             }
 
             if (!string.IsNullOrEmpty(searchByGenre))
             {
-                dvdtekaContext = dvdtekaContext.Where(a => a.Genre.Name.ToUpper().Contains(searchByGenre.ToUpper()));
+                dvdContext = dvdContext.Where(a => a.Genre.Name.ToUpper().Contains(searchByGenre.ToUpper()));
             }
 
-            return View(await dvdtekaContext.ToListAsync());
+            if (!string.IsNullOrEmpty(searchByGenre))
+            {
+                dvdContext = dvdContext.Where(a => a.Genre.Name.ToUpper().Contains(searchByGenre.ToUpper()));
+            }
+
+            if (searchByYear != null)
+            {
+                dvdContext = dvdContext.Where(a => a.Year == searchByYear);
+            }
+
+            var dataCount = await dvdContext.CountAsync();
+
+            ViewData["pages"] = (int)Math.Ceiling( decimal.Divide( dataCount, pageSize ) );
+
+            var skip = page == 1 ? 0 : pageSize * (page - 1);
+
+            switch (sortBy)
+            {
+                case "Name":
+                    dvdContext = sort == "asc" ? dvdContext.OrderBy(a => a.Name) : dvdContext.OrderByDescending(a => a.Name);
+                    break;
+                case "Year":
+                    dvdContext = sort == "asc" ? dvdContext.OrderBy(a => a.Year) : dvdContext.OrderByDescending(a => a.Year);
+                    break;
+                case "Price":
+                    dvdContext = sort == "asc" ? dvdContext.OrderBy(a => a.Price) : dvdContext.OrderByDescending(a => a.Price);
+                    break;
+                case "Quantity":
+                    dvdContext = sort == "asc" ? dvdContext.OrderBy(a => a.Quantity) : dvdContext.OrderByDescending(a => a.Quantity);
+                    break;
+                case "AvailableQuantity":
+                    dvdContext = sort == "asc" ? dvdContext.OrderBy(a => a.AvailableQuantity) : dvdContext.OrderByDescending(a => a.AvailableQuantity);
+                    break;
+                case "DirectorName":
+                    dvdContext = sort == "asc" ? dvdContext.OrderBy(a => a.Director.Name) : dvdContext.OrderByDescending(a => a.Director.Name);
+                    break;
+                case "GenreName":
+                    dvdContext = sort == "asc" ? dvdContext.OrderBy(a => a.Genre.Name) : dvdContext.OrderByDescending(a => a.Genre.Name);
+                    break;
+                default:
+                    dvdContext = sort == "asc" ? dvdContext.OrderBy(a => a.Id) : dvdContext.OrderByDescending(a => a.Id);
+                    break;
+            }
+
+            dvdContext = dvdContext.Skip(skip).Take(pageSize);
+
+            return View(await dvdContext.ToListAsync());
         }
 
         // GET: Dvds/Details/5
@@ -72,8 +126,6 @@ namespace Dvdteka.Controllers
         }
 
         // POST: Dvds/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Price,Year,Quantity,DirectorId,GenreId")] Dvd dvd)
@@ -109,8 +161,6 @@ namespace Dvdteka.Controllers
         }
 
         // POST: Dvds/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Price,Year,Quantity,AvailableQuantity,DirectorId,GenreId")] Dvd dvd)

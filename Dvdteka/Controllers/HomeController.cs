@@ -67,7 +67,7 @@ namespace Dvdteka.Controllers
                     Name = "Dvd " + i,
                     Quantity = 5,
                     AvailableQuantity = 5,
-                    Price = 29,
+                    Price = rnd.Next(16, 49),
                     Year = i%2 == 0 ? DateTime.Now.AddYears(-1).Year : DateTime.Now.AddYears(-2).Year,
                     GenreId = genres[rnd.Next(0, genres.Count - 1)].Id,
                     DirectorId = directors[rnd.Next(0, directors.Count - 1)].Id
