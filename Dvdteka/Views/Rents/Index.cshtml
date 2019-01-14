@@ -1,14 +1,21 @@
 ﻿@model IEnumerable<Dvdteka.Data.Rent>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Posudbe";
 }
 
-<h1>Index</h1>
+<h1>Posudbe</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<form>
+    <div class="input-group mb-3">
+        <input type="text" name="memberName" class="form-control" value="@ViewBag.memberName" placeholder="Traži po članu..." />
+        <input type="text" name="dvdName" class="form-control" value="@ViewBag.dvdName" placeholder="Traži po dvd-u"/>
+        <div class="input-group-append">
+            <input type="submit" value="Traži" class="btn btn-outline-secondary" />
+        </div>
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>

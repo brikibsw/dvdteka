@@ -1,0 +1,27 @@
+﻿
+<nav>
+    <ul class="pagination justify-content-end">
+
+        @for (int i = 0; i < int.Parse(ViewBag.pages.ToString()); i++)
+        {
+            <li class="page-item @((i + 1) == ViewBag.page ? "active" : "")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-page="@(i+1)"
+                   asp-route-searchByGenre="@ViewBag.searchByGenre"
+                   asp-route-searchByDirector="@ViewBag.searchByDirector"
+                   asp-route-searchByName="@ViewBag.searchByName"
+                   asp-route-searchByYear="@ViewBag.searchByYear"
+                   asp-route-pageSize="@ViewBag.pageSize">
+                    @(i + 1)
+                </a>
+            </li>
+        }
+        <li>
+            <select onchange="selectChanged()"
+                    id="pageSizeSelect"
+                    name="pageSizeSelect"
+                    class="form-control"
+                    asp-items="new SelectList(new List<int> { 10,20,30 }, ViewBag.pageSize);"></select>
+        </li>
+    </ul>
+</nav>

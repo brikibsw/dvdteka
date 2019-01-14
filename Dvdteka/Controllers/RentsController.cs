@@ -19,10 +19,46 @@ namespace Dvdteka.Controllers
         }
 
         // GET: Rents
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string memberName, string dvdName)
         {
-            var dvdtekaContext = _context.Rents.Include(r => r.Dvd).Include(r => r.Member);
-            return View(await dvdtekaContext.ToListAsync());
+            ViewData["memberName"] = memberName;
+            ViewData["dvdName"] = dvdName;
+            var rents = _context.Rents.Include(r => r.Dvd).Include(r => r.Member).AsQueryable();
+
+            if( !string.IsNullOrEmpty(memberName))
+            {
+                rents = rents.Where(a => a.Member.Name.ToUpper().Contains(memberName.ToUpper()));
+            }
+
+            if (!string.IsNullOrEmpty(dvdName))
+            {
+                rents = rents.Where(a => a.Dvd.Name.ToUpper().Contains(dvdName.ToUpper()));
+            }
+
+            rents = rents.Where(a => a.ReturnTime == null);
+
+            return View(await rents.ToListAsync());
+        }
+
+        public async Task<IActionResult> ClosedRents(string memberName, string dvdName)
+        {
+            ViewData["memberName"] = memberName;
+            ViewData["dvdName"] = dvdName;
+            var rents = _context.Rents.Include(r => r.Dvd).Include(r => r.Member).AsQueryable();
+
+            if (!string.IsNullOrEmpty(memberName))
+            {
+                rents = rents.Where(a => a.Member.Name.ToUpper().Contains(memberName.ToUpper()));
+            }
+
+            if (!string.IsNullOrEmpty(dvdName))
+            {
+                rents = rents.Where(a => a.Dvd.Name.ToUpper().Contains(dvdName.ToUpper()));
+            }
+
+            rents = rents.Where(a => a.ReturnTime != null);
+
+            return View("Index", await rents.ToListAsync());
         }
 
         // GET: Rents/Details/5
@@ -140,7 +176,7 @@ namespace Dvdteka.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Details), new { id = rent.Id });
             }
             return View(rent);
         }
