@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Dvdteka.Data;
+using Dvdteka.Models;
 
 namespace Dvdteka.Controllers
 {
@@ -37,7 +38,18 @@ namespace Dvdteka.Controllers
 
             rents = rents.Where(a => a.ReturnTime == null);
 
-            return View(await rents.ToListAsync());
+            var rentViewModels = rents.Select(a => new RentViewModel
+            {
+                Id = a.Id,
+                DvdName = a.Dvd.Name,
+                MemberName = a.Member.Name,
+                RentTime = a.RentTime,
+                ReturnTime = a.ReturnTime,
+                Price = a.Price,
+                Returning = false
+            });
+
+            return View(await rentViewModels.ToListAsync());
         }
 
         public async Task<IActionResult> ClosedRents(string memberName, string dvdName)
@@ -56,9 +68,18 @@ namespace Dvdteka.Controllers
                 rents = rents.Where(a => a.Dvd.Name.ToUpper().Contains(dvdName.ToUpper()));
             }
 
-            rents = rents.Where(a => a.ReturnTime != null);
+            var rentViewModels = rents.Select(a => new RentViewModel
+            {
+                Id = a.Id,
+                DvdName = a.Dvd.Name,
+                MemberName = a.Member.Name,
+                RentTime = a.RentTime,
+                ReturnTime = a.ReturnTime,
+                Price = a.Price,
+                Returning = false
+            });
 
-            return View("Index", await rents.ToListAsync());
+            return View("Index", await rentViewModels.ToListAsync());
         }
 
         // GET: Rents/Details/5
@@ -95,9 +116,39 @@ namespace Dvdteka.Controllers
             return View(rent);
         }
 
-        // POST: Rents/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        public IActionResult ReturnMany(IEnumerable<RentViewModel> rents)
+        {
+            var returnManyViewModel = new ReturnManyViewModel
+            {
+                ReturnTime = DateTime.Now,
+                Rents = rents.Where(a => a.Returning).ToList()
+            };
+
+            return View(returnManyViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveReturnMany(ReturnManyViewModel returnManyViewModel)
+        {
+            var ids = returnManyViewModel.Rents.Where(a => a.Returning).Select(a => a.Id);
+            var rents = await _context.Rents.Include(a => a.Dvd).Where(a => ids.Contains(a.Id)).ToListAsync();
+
+            foreach (var rent in rents)
+            {
+                rent.ReturnTime = returnManyViewModel.ReturnTime;
+                var time = rent.ReturnTime - rent.RentTime;
+                rent.Price = (decimal)(time.Value.Days * (double)rent.Dvd.Price);
+
+                rent.Dvd.AvailableQuantity = rent.Dvd.AvailableQuantity + 1;
+                _context.Dvds.Update(rent.Dvd);
+
+                _context.Update(rent);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DvdId,MemberId,RentTime,ReturnTime,Price")] Rent rent)

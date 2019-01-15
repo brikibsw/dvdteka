@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Dvdteka.Data.Rent>
+﻿@model List<Dvdteka.Models.RentViewModel>
 
 @{
     ViewData["Title"] = "Posudbe";
@@ -16,51 +16,68 @@
     </div>
 </form>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Dvd)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Member)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RentTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ReturnTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Dvd.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Member.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RentTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReturnTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<form asp-action="ReturnMany" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>
+                    DvdName
+                </th>
+                <th>
+                    MemberName
+                </th>
+                <th>
+                    RentTime
+                </th>
+                <th>
+                    ReturnTime
+                </th>
+                <th>
+                    Price
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input type="hidden" asp-for="@Model[i].Id" />
+                            <input type="hidden" asp-for="@Model[i].DvdName" />
+                            <input type="hidden" asp-for="@Model[i].MemberName" />
+                            <input type="hidden" asp-for="@Model[i].RentTime" />
+
+                            <input asp-for="@Model[i].Returning" type="checkbox" class="form-check-input">
+                        </div>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].DvdName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].MemberName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].RentTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].ReturnTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].Price)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@Model[i].Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@Model[i].Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@Model[i].Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="justify-content-end">
+        <input type="submit" name="save" value="Spremi" class="btn btn-success" />
+    </div>
+</form>
