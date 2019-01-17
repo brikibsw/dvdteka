@@ -28,20 +28,20 @@
     <tbody>
         @foreach (var item in Model.Invoice.InvoiceItems)
         {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.DvdName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RentTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReturnTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-        </tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DvdName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RentTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReturnTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+            </tr>
         }
         <tr>
             <td></td>

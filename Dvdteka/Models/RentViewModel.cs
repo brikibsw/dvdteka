@@ -10,6 +10,8 @@ namespace Dvdteka.Models
         [Display(Name = "Dvd")]
         public string DvdName { get; set; }
 
+        public int MemberId { get; set; }
+
         [Display(Name = "Član")]
         public string MemberName { get; set; }
 

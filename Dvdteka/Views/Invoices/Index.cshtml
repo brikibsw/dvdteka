@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Dvdteka.Models.InvoiceViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Member
+            </th>
+            <th>
+                ReturnTime
+            </th>
+            <th>Cijena</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var invoice in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => invoice.MemberName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => invoice.ReturnTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => invoice.PriceSum)
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@invoice.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@invoice.Id">Delete</a>
+            </td>
+        </tr>
+        @foreach(var item in invoice.InvoiceItems)
+        {
+        <tr>
+            <td></td>
+            <td>
+                @Html.DisplayFor(a => item.DvdName)
+            </td>
+            <td>
+                @Html.DisplayFor(a => item.RentTime)
+            </td>
+            <td>
+                @Html.DisplayFor(a => item.ReturnTime)
+            </td>
+            <td>
+                @Html.DisplayFor(a => item.Price)
+            </td>
+        </tr>
+        }
+}
+    </tbody>
+</table>

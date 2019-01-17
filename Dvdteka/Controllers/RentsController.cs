@@ -43,6 +43,7 @@ namespace Dvdteka.Controllers
                 Id = a.Id,
                 DvdName = a.Dvd.Name,
                 MemberName = a.Member.Name,
+                MemberId = a.MemberId,
                 RentTime = a.RentTime,
                 ReturnTime = a.ReturnTime,
                 Price = a.Price,
@@ -73,6 +74,7 @@ namespace Dvdteka.Controllers
                 Id = a.Id,
                 DvdName = a.Dvd.Name,
                 MemberName = a.Member.Name,
+                MemberId = a.MemberId,
                 RentTime = a.RentTime,
                 ReturnTime = a.ReturnTime,
                 Price = a.Price,
@@ -175,20 +177,7 @@ namespace Dvdteka.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(ReturnRecapitulation), new { id = invoice.Id });
-        }
-
-        public IActionResult ReturnRecapitulation(int id)
-        {
-            var invoice = _context.Invoices.Include(a => a.InvoiceItems).FirstOrDefault(a => a.Id == id);
-
-            var model = new ReturnRecapitulationViewModel
-            {
-                Invoice = invoice,
-                Sum = invoice.InvoiceItems.Sum(a => a.Price)
-            };
-
-            return View(model);
+            return RedirectToAction("Details", "Invoices", new { id = invoice.Id });
         }
 
         [HttpPost]
