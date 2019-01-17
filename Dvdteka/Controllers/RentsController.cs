@@ -118,6 +118,15 @@ namespace Dvdteka.Controllers
 
         public IActionResult ReturnMany(IEnumerable<RentViewModel> rents)
         {
+            ViewData["error"] = false;
+            var group = rents.Where(a => a.Returning).GroupBy(a => a.MemberName);
+
+            if (group.Count() > 1)
+            {
+                ModelState.AddModelError("MemberId", "Povrat može biti samo za istog člana!");
+                ViewData["error"] = true;
+            }
+
             var returnManyViewModel = new ReturnManyViewModel
             {
                 ReturnTime = DateTime.Now,
@@ -131,7 +140,7 @@ namespace Dvdteka.Controllers
         public async Task<IActionResult> SaveReturnMany(ReturnManyViewModel returnManyViewModel)
         {
             var ids = returnManyViewModel.Rents.Where(a => a.Returning).Select(a => a.Id);
-            var rents = await _context.Rents.Include(a => a.Dvd).Where(a => ids.Contains(a.Id)).ToListAsync();
+            var rents = await _context.Rents.Include(a => a.Dvd).Include(a => a.Member).Where(a => ids.Contains(a.Id)).ToListAsync();
 
             foreach (var rent in rents)
             {
@@ -143,10 +152,43 @@ namespace Dvdteka.Controllers
                 _context.Dvds.Update(rent.Dvd);
 
                 _context.Update(rent);
-                await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Index));
+            await _context.SaveChangesAsync();
+
+            var invoice = new Invoice
+            {
+                ReturnTime = returnManyViewModel.ReturnTime,
+                MemberId = rents.FirstOrDefault().MemberId,
+                MemberName = rents.FirstOrDefault().Member.Name,
+                InvoiceItems = rents.Select(a => new InvoiceItem
+                {
+                    DvdId = a.DvdId,
+                    DvdName = a.Dvd.Name,
+                    RentTime = a.RentTime,
+                    ReturnTime = returnManyViewModel.ReturnTime,
+                    Price = (decimal)a.Price
+                }).ToList()
+            };
+
+            _context.Invoices.Add(invoice);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(ReturnRecapitulation), new { id = invoice.Id });
+        }
+
+        public IActionResult ReturnRecapitulation(int id)
+        {
+            var invoice = _context.Invoices.Include(a => a.InvoiceItems).FirstOrDefault(a => a.Id == id);
+
+            var model = new ReturnRecapitulationViewModel
+            {
+                Invoice = invoice,
+                Sum = invoice.InvoiceItems.Sum(a => a.Price)
+            };
+
+            return View(model);
         }
 
         [HttpPost]

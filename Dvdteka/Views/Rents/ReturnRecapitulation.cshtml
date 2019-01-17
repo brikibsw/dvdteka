@@ -1,0 +1,53 @@
+﻿@model Dvdteka.Models.ReturnRecapitulationViewModel
+
+@{
+    ViewData["Title"] = "Rekapitulacija";
+}
+
+<h1>Račun br. @Model.Invoice.Id</h1>
+
+<h2>Član: @Model.Invoice.MemberName</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                DvdName
+            </th>
+            <th>
+                RentTime
+            </th>
+            <th>
+                ReturnTime
+            </th>
+            <th>
+                Price
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Invoice.InvoiceItems)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.DvdName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RentTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReturnTime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Price)
+            </td>
+        </tr>
+        }
+        <tr>
+            <td></td>
+            <td></td>
+            <td>Ukupno:</td>
+            <td>@Model.Sum.ToString("C")</td>
+        </tr>
+    </tbody>
+</table>

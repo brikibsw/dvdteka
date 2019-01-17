@@ -7,6 +7,7 @@
 <h1>Povrat</h1>
 
 <form asp-action="SaveReturnMany" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
     <input asp-for="ReturnTime" class="form-control" />
 
     <table class="table">
@@ -22,13 +23,6 @@
                 <th>
                     RentTime
                 </th>
-                <th>
-                    ReturnTime
-                </th>
-                <th>
-                    Price
-                </th>
-                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -51,23 +45,15 @@
                     <td>
                         @Html.DisplayFor(modelItem => Model.Rents[i].RentTime)
                     </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => Model.Rents[i].ReturnTime)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => Model.Rents[i].Price)
-                    </td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@Model.Rents[i].Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@Model.Rents[i].Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@Model.Rents[i].Id">Delete</a>
-                    </td>
                 </tr>
             }
         </tbody>
     </table>
-    <div class="justify-content-end">
-        <input type="submit" name="save" value="Spremi" class="btn btn-success" />
+    <div class="col col-12 justify-content-end">
+        @if (!ViewBag.error)
+        {
+            <input type="submit" name="save" value="Spremi" class="btn btn-success" />
+        }
     </div>
 </form>
 

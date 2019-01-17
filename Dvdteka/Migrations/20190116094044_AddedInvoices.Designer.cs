@@ -3,14 +3,16 @@ using System;
 using Dvdteka.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Dvdteka.Migrations
 {
     [DbContext(typeof(DvdtekaContext))]
-    partial class DvdtekaContextModelSnapshot : ModelSnapshot
+    [Migration("20190116094044_AddedInvoices")]
+    partial class AddedInvoices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

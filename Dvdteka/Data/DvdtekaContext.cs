@@ -1,16 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace Dvdteka.Data
 {
     public class DvdtekaContext : DbContext
     {
-        private readonly ILoggerFactory loggerFactory;
-
-        public DvdtekaContext(DbContextOptions<DvdtekaContext> options, ILoggerFactory loggerFactory) 
+        public DvdtekaContext(DbContextOptions<DvdtekaContext> options) 
             : base(options)
         {
-            this.loggerFactory = loggerFactory;
         }
 
         public DbSet<Director> Directors { get; set; }
@@ -25,11 +21,8 @@ namespace Dvdteka.Data
 
         public DbSet<Rent> Rents { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
+        public DbSet<Invoice> Invoices { get; set; }
 
-            optionsBuilder.UseLoggerFactory(loggerFactory);
-        }
+        public DbSet<InvoiceItem> InvoiceItems { get; set; }
     }
 }
