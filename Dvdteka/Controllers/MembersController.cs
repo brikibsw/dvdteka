@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Dvdteka.Data;
+using Dvdteka.Models;
 
 namespace Dvdteka.Controllers
 {
@@ -32,8 +33,28 @@ namespace Dvdteka.Controllers
                 return NotFound();
             }
 
-            var member = await _context.Members.Include(a => a.MemberContacts)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var member = await _context.Members.Select(a => new MemberViewModel
+            {
+                Id = a.Id,
+                Address = a.Address,
+                Name = a.Name,
+                ClosedRentsSum = a.Rents.Where(b => b.ReturnTime != null).Count(),
+                OpenedRentsSum = a.Rents.Where(b => b.ReturnTime == null).Count(),
+                PriceSum = (decimal)a.Rents.Where(b => b.ReturnTime != null).Sum(p => p.Price),
+                MemberContacts = a.MemberContacts.Select(m => new MemberContactViewModel
+                {
+                    Id = m.Id,
+                    Type = m.Type,
+                    Value = m.Value
+                }).ToList(),
+                OpenedRents = a.Rents.Where(b => b.ReturnTime == null).Select(r => new RentViewModel
+                {
+                    Id = r.Id,
+                    DvdName = r.Dvd.Name,
+                    RentTime = r.RentTime
+                }).ToList()
+            }).FirstOrDefaultAsync(m => m.Id == id);
+
             if (member == null)
             {
                 return NotFound();

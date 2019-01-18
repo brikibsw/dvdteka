@@ -1,0 +1,115 @@
+﻿@model List<Dvdteka.Models.RentViewModel>
+
+@{
+    ViewData["Title"] = "Zatvorene posudbe";
+}
+
+<h1>Zatvorene posudbe</h1>
+
+<form id="searchForm" >
+    <div class="input-group mb-3">
+        <input type="text" name="memberName" class="form-control" value="@ViewBag.memberName" placeholder="Traži po članu..." />
+        <input type="text" name="dvdName" class="form-control" value="@ViewBag.dvdName" placeholder="Traži po dvd-u" />
+        <input type="hidden" name="sortBy" value="@ViewBag.sortBy" />
+        <input type="hidden" name="sort" value="@ViewBag.sort" />
+        <input type="hidden" name="pageSize" id="pageSize" value="@ViewBag.pageSize" />
+        <div class="input-group-append">
+            <input type="submit" value="Traži" class="btn btn-outline-secondary" />
+        </div>
+    </div>
+</form>
+<br />
+
+@await Html.PartialAsync("_RentPagination", ViewData)
+
+<form asp-action="ReturnMany" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @await Html.PartialAsync("_RentTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "DvdName" },
+                                     { "DisplayNameFor", "Dvd" }
+                                 })
+                </th>
+                <th>
+                    @await Html.PartialAsync("_RentTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "MemberName" },
+                                     { "DisplayNameFor", "Član" }
+                                 })
+                </th>
+                <th>
+                    @await Html.PartialAsync("_RentTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "RentTime" },
+                                     { "DisplayNameFor", "Datum posudbe" }
+                                 })
+                </th>
+                <th>
+                    @await Html.PartialAsync("_RentTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "ReturnTime" },
+                                     { "DisplayNameFor", "Datum povrata" }
+                                 })
+                </th>
+                <th>
+                    @await Html.PartialAsync("_RentTableHeader",
+                                 new ViewDataDictionary(ViewData)
+                                 {
+                                     { "Name", "Price" },
+                                     { "DisplayNameFor", "Cijena" }
+                                 })
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count(); i++)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].DvdName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].MemberName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].RentTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].ReturnTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model[i].Price)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@Model[i].Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@Model[i].Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@Model[i].Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="justify-content-end">
+        <input type="submit" name="save" value="Spremi" class="btn btn-success" />
+    </div>
+</form>
+
+@section Scripts {
+    <script type="text/javascript">
+        function selectChanged() {
+            var s = document.getElementById("pageSizeSelect");
+            var i = document.getElementById("pageSize");
+            i.value = s.value;
+            var f = document.getElementById("searchForm");
+            f.submit();
+        }
+    </script>
+}

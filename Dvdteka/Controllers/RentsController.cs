@@ -53,10 +53,17 @@ namespace Dvdteka.Controllers
             return View(await rentViewModels.ToListAsync());
         }
 
-        public async Task<IActionResult> ClosedRents(string memberName, string dvdName)
+        public async Task<IActionResult> ClosedRents(string memberName, string dvdName, string sortBy, string sort = "asc", int page = 1, int pageSize = 10)
         {
             ViewData["memberName"] = memberName;
             ViewData["dvdName"] = dvdName;
+
+            ViewData["page"] = page;
+            ViewData["pageSize"] = pageSize;
+
+            ViewData["sortBy"] = sortBy;
+            ViewData["sort"] = sort;
+
             var rents = _context.Rents.Include(r => r.Dvd).Include(r => r.Member).AsQueryable();
 
             if (!string.IsNullOrEmpty(memberName))
@@ -68,6 +75,38 @@ namespace Dvdteka.Controllers
             {
                 rents = rents.Where(a => a.Dvd.Name.ToUpper().Contains(dvdName.ToUpper()));
             }
+
+            rents = rents.Where(a => a.ReturnTime != null);
+
+            var dataCount = await rents.CountAsync();
+
+            ViewData["pages"] = (int)Math.Ceiling(decimal.Divide(dataCount, pageSize));
+
+            var skip = page == 1 ? 0 : pageSize * (page - 1);
+
+            switch (sortBy)
+            {
+                case "MemberName":
+                    rents = sort == "asc" ? rents.OrderBy(a => a.Member.Name) : rents.OrderByDescending(a => a.Member.Name);
+                    break;
+                case "DvdName":
+                    rents = sort == "asc" ? rents.OrderBy(a => a.Dvd.Name) : rents.OrderByDescending(a => a.Dvd.Name);
+                    break;
+                case "RentTime":
+                    rents = sort == "asc" ? rents.OrderBy(a => a.RentTime) : rents.OrderByDescending(a => a.RentTime);
+                    break;
+                case "ReturnTime":
+                    rents = sort == "asc" ? rents.OrderBy(a => a.ReturnTime) : rents.OrderByDescending(a => a.ReturnTime);
+                    break;
+                case "Price":
+                    rents = sort == "asc" ? rents.OrderBy(a => a.Price) : rents.OrderByDescending(a => a.Price);
+                    break;
+                default:
+                    rents = sort == "asc" ? rents.OrderBy(a => a.Id) : rents.OrderByDescending(a => a.Id);
+                    break;
+            }
+
+            rents = rents.Skip(skip).Take(pageSize);
 
             var rentViewModels = rents.Select(a => new RentViewModel
             {
@@ -81,7 +120,7 @@ namespace Dvdteka.Controllers
                 Returning = false
             });
 
-            return View("Index", await rentViewModels.ToListAsync());
+            return View(await rentViewModels.ToListAsync());
         }
 
         // GET: Rents/Details/5

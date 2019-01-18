@@ -1,4 +1,4 @@
-﻿@model Dvdteka.Data.Member
+﻿@model Dvdteka.Models.MemberViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -16,14 +16,38 @@
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
+
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Address)
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Address)
         </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.OpenedRentsSum)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.OpenedRentsSum)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ClosedRentsSum)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.ClosedRentsSum)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PriceSum)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.PriceSum.ToString("C")
+        </dd>
+
     </dl>
 
+    <h3>Kontakt informacije</h3>
     <table class="table">
         <thead>
             <tr>
@@ -47,6 +71,39 @@
         </tbody>
     </table>
 
+    <h3>Otvorene posudbe</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    DvdName
+                </th>
+                <th>
+                    RentTime
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.OpenedRents.Count(); i++)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model.OpenedRents[i].DvdName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => Model.OpenedRents[i].RentTime)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@Model.OpenedRents[i].Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@Model.OpenedRents[i].Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@Model.OpenedRents[i].Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
     
 </div>
 <div>

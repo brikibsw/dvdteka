@@ -1,0 +1,18 @@
+﻿<a asp-action="ClosedRents"
+   asp-route-page="@ViewBag.page"
+   asp-route-memberName="@ViewBag.memberName"
+   asp-route-dvdName="@ViewBag.dvdName"
+   asp-route-pageSize="@ViewBag.pageSize"
+   asp-route-sortBy="@ViewBag.Name"
+   asp-route-sort="@(ViewBag.sort == "asc" ? "desc" : "asc")">
+    @ViewBag.DisplayNameFor
+</a>
+
+@if (ViewBag.sort == "asc" && ViewBag.sortBy == ViewBag.Name)
+{
+    <span>&#x25B2;</span>
+}
+@if (ViewBag.sort == "desc" && ViewBag.sortBy == ViewBag.Name)
+{
+    <span>&#x25BC;</span>
+}

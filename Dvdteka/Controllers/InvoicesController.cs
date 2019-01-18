@@ -20,9 +20,18 @@ namespace Dvdteka.Controllers
         }
 
         // GET: Invoices
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string memberName)
         {
-            var list = await _context.Invoices.Select(a => new InvoiceViewModel
+            ViewData["memberName"] = memberName;
+
+            var invoices = _context.Invoices.AsQueryable();
+            
+            if(!string.IsNullOrEmpty(memberName))
+            {
+                invoices = invoices.Where(a => a.MemberName.ToUpper().Contains(memberName.ToUpper()));
+            }
+
+            var list = await invoices.Select(a => new InvoiceViewModel
             {
                 Id = a.Id,
                 MemberId = a.MemberId,

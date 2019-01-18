@@ -1,10 +1,19 @@
 ﻿@model IEnumerable<Dvdteka.Models.InvoiceViewModel>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Fakture";
 }
 
-<h1>Index</h1>
+<h1>Fakture</h1>
+
+<form>
+    <div class="input-group mb-3">
+        <input type="text" name="memberName" class="form-control" value="@ViewBag.memberName" placeholder="Traži po članu..." />
+        <div class="input-group-append">
+            <input type="submit" value="Traži" class="btn btn-outline-secondary" />
+        </div>
+    </div>
+</form>
 
 <table class="table">
     <thead>
