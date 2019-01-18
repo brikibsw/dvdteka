@@ -7,7 +7,7 @@
 <h1>Povrat</h1>
 
 <form asp-action="SaveReturnMany" method="post">
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <div id="errors" asp-validation-summary="All" class="text-danger"></div>
     <input asp-for="ReturnTime" class="form-control" />
 
     <table class="table">
@@ -85,6 +85,15 @@
             var valid = grouped.length == 1;
             var btn = document.getElementById("save");
             btn.disabled = !valid;
+
+            var errorsDiv = document.getElementById("errors");
+            if (errorsDiv != null && errorsDiv != undefined) {
+                if (valid) {
+                    errorsDiv.style.display = "none";
+                } else {
+                    errorsDiv.style.display = "block";
+                }
+            }
         }
 
         function groupBy(array, col) {
