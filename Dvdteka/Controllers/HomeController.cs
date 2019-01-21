@@ -26,6 +26,7 @@ namespace Dvdteka.Controllers
                                         {
                                             Id = a.Id,
                                             DvdName = a.Dvd.Name,
+                                            DvdId = a.DvdId,
                                             MemberName = a.Member.Name,
                                             MemberId = a.MemberId,
                                             RentTime = a.RentTime
@@ -43,7 +44,7 @@ namespace Dvdteka.Controllers
                                     .Select(a => new DashboardMemberModel { MemberName = a.Key.Member, Sum = a.Sum(b => b.InvoiceItems.Sum(c => c.Price)) })
                                     .ToListAsync();
 
-            var topDvds = await context.Rents.GroupBy(a => new { Id = a.DvdId, DvdName = a.Dvd.Name })
+            var topDvds = await context.Rents.GroupBy(a => new { DvdId = a.DvdId, DvdName = a.Dvd.Name })
                                         .OrderByDescending(a => a.Count()).Take(5)
                                         .Select(a => new DashboardDvdModel { DvdName = a.Key.DvdName, TimesRented = a.Count() })
                                         .ToListAsync();

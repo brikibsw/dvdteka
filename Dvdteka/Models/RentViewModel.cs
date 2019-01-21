@@ -7,6 +7,8 @@ namespace Dvdteka.Models
     {
         public int Id { get; set; }
 
+        public int DvdId { get; set; }
+
         [Display(Name = "Dvd")]
         public string DvdName { get; set; }
 

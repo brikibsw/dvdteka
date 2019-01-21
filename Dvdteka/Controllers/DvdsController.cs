@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Dvdteka.Data;
 using System;
+using Dvdteka.Models;
 
 namespace Dvdteka.Controllers
 {
@@ -105,14 +106,38 @@ namespace Dvdteka.Controllers
                 return NotFound();
             }
 
-            var dvd = await _context.Dvds
-                .Include(d => d.Director)
-                .Include(d => d.Genre)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var dvd = await _context.Dvds.Select(a => new DvdViewModel
+            {
+                Id = a.Id,
+                AvailableQuantity = a.AvailableQuantity,
+                DirectorId = a.DirectorId,
+                DirectorName = a.Director.Name,
+                GenreId = a.GenreId,
+                GenreName = a.Genre.Name,
+                Name = a.Name,
+                Price = a.Price,
+                Quantity = a.Quantity,
+                Year = a.Year,
+                OpenedRents = a.Rents.Where(b => b.ReturnTime == null).Select(c => new RentViewModel
+                                    {
+                                        Id = c.Id,
+                                        MemberName = c.Member.Name,
+                                        RentTime = c.RentTime
+                                    }).ToList()
+            }).FirstOrDefaultAsync(m => m.Id == id);
+
             if (dvd == null)
             {
                 return NotFound();
             }
+
+            foreach (var rent in dvd.OpenedRents)
+            {
+                var time = DateTime.Now - rent.RentTime;
+                rent.DaysRented = time.Days;
+            }
+
+            dvd.OpenedRents = dvd.OpenedRents.OrderByDescending(a => a.DaysRented).ToList();
 
             return View(dvd);
         }

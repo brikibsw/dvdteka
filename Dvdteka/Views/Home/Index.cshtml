@@ -81,7 +81,7 @@
             @foreach (var item in Model.OpenedRents)
             {
                 <tr>
-                    <td>@item.DvdName</td>
+                    <td> <a asp-controller="Dvds" asp-action="Details" asp-route-id="@item.DvdId"> @item.DvdName </a> </td>
                     <td> <a asp-controller="Members" asp-action="Details" asp-route-id="@item.MemberId"> @item.MemberName </a> </td>
                     <td>@item.RentTime</td>
                     <td class="@( item.DaysRented > 10 ? "rent-warning" : "" )">@item.DaysRented</td>

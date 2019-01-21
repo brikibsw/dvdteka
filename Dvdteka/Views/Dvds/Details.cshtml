@@ -1,4 +1,4 @@
-﻿@model Dvdteka.Data.Dvd
+﻿@model Dvdteka.Models.DvdViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -41,19 +41,43 @@
             @Html.DisplayFor(model => model.AvailableQuantity)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Director)
+            @Html.DisplayNameFor(model => model.DirectorName)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Director.Name)
+            @Html.DisplayFor(model => model.DirectorName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Genre)
+            @Html.DisplayNameFor(model => model.GenreName)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Genre.Name)
+            @Html.DisplayFor(model => model.GenreName)
         </dd>
     </dl>
 </div>
+
+<div>
+    <h2>Otvorene posudbe za @Model.Name</h2>
+    <table class="table table-bordered table-hover table-info">
+        <thead>
+            <tr>
+                <th>Član</th>
+                <th>Vrijeme posudbe</th>
+                <th>Dana posudjen</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OpenedRents)
+            {
+                <tr>
+                    <td>@item.MemberName</td>
+                    <td>@item.RentTime</td>
+                    <td class="@(item.DaysRented > 10 ? "rent-warning" : "" )">@item.DaysRented</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
