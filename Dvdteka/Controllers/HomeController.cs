@@ -19,9 +19,43 @@ namespace Dvdteka.Controllers
             this.context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var openedRents = await context.Rents.Where(a => a.ReturnTime == null)
+                                        .Select(a => new RentViewModel
+                                        {
+                                            Id = a.Id,
+                                            DvdName = a.Dvd.Name,
+                                            MemberName = a.Member.Name,
+                                            MemberId = a.MemberId,
+                                            RentTime = a.RentTime
+                                        }).ToListAsync();
+
+            foreach (var openedRent in openedRents)
+            {
+                var time = DateTime.Now - openedRent.RentTime;
+                openedRent.DaysRented = time.Days;
+            }
+
+            var topMembers = await context.Invoices
+                                    .GroupBy(a => new { MemberId = a.MemberId, Member = a.MemberName })
+                                    .OrderByDescending(a => a.Sum(b => b.InvoiceItems.Sum(c => c.Price))).Take(5)
+                                    .Select(a => new DashboardMemberModel { MemberName = a.Key.Member, Sum = a.Sum(b => b.InvoiceItems.Sum(c => c.Price)) })
+                                    .ToListAsync();
+
+            var topDvds = await context.Rents.GroupBy(a => new { Id = a.DvdId, DvdName = a.Dvd.Name })
+                                        .OrderByDescending(a => a.Count()).Take(5)
+                                        .Select(a => new DashboardDvdModel { DvdName = a.Key.DvdName, TimesRented = a.Count() })
+                                        .ToListAsync();
+
+            var dashboardModel = new DashboardModel
+            {
+                OpenedRents = openedRents.OrderByDescending(a => a.DaysRented).ToList(),
+                TopDvds = topDvds,
+                TopMembers = topMembers
+            };
+
+            return View(dashboardModel);
         }
 
         public IActionResult Privacy()

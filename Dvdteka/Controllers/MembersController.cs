@@ -60,6 +60,14 @@ namespace Dvdteka.Controllers
                 return NotFound();
             }
 
+            foreach (var rentViewModel in member.OpenedRents)
+            {
+                var time = DateTime.Now - rentViewModel.RentTime;
+                rentViewModel.DaysRented = time.Days;
+            }
+
+            member.OpenedRents = member.OpenedRents.OrderByDescending(a => a.DaysRented).ToList();
+
             return View(member);
         }
 

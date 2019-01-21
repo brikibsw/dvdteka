@@ -1,8 +1,93 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Dvdteka.Models.DashboardModel
+
+@{
+    ViewData["Title"] = "Dvdteka";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+
+    <div class="col">
+        <h2>
+            <a asp-controller="Members" asp-action="Index">
+                Top članovi
+            </a>
+        </h2>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Član</th>
+                    <th>Suma</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TopMembers)
+                {
+                    <tr>
+                        <td>@item.MemberName</td>
+                        <td>@item.Sum.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="col">
+        <h2>
+            <a asp-controller="Dvds" asp-action="Index">
+                Top dvdovi
+            </a>
+        </h2>
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Dvd</th>
+                    <th>Posuđen puta</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.TopDvds)
+                {
+                    <tr>
+                        <td>@item.DvdName</td>
+                        <td>@item.TimesRented</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
 </div>
+
+<div class="row">
+    <h2>
+        <a asp-controller="Rents" asp-action="Index">
+            Otvorene posudbe
+        </a>
+    </h2>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Dvd</th>
+                <th>Član</th>
+                <th>Vrijeme posudbe</th>
+                <th>Dana posudjen</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OpenedRents)
+            {
+                <tr>
+                    <td>@item.DvdName</td>
+                    <td> <a asp-controller="Members" asp-action="Details" asp-route-id="@item.MemberId"> @item.MemberName </a> </td>
+                    <td>@item.RentTime</td>
+                    <td class="@( item.DaysRented > 10 ? "rent-warning" : "" )">@item.DaysRented</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
