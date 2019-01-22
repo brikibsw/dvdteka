@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Dvdteka.Data;
 
@@ -11,17 +8,17 @@ namespace Dvdteka.Controllers
 {
     public class GenresController : Controller
     {
-        private readonly DvdtekaContext _context;
+        private readonly DvdtekaContext context;
 
         public GenresController(DvdtekaContext context)
         {
-            _context = context;
+            this.context = context;
         }
 
         // GET: Genres
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Genres.ToListAsync());
+            return View(await context.Genres.ToListAsync());
         }
 
         // GET: Genres/Details/5
@@ -32,7 +29,7 @@ namespace Dvdteka.Controllers
                 return NotFound();
             }
 
-            var genre = await _context.Genres
+            var genre = await context.Genres
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (genre == null)
             {
@@ -57,8 +54,8 @@ namespace Dvdteka.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(genre);
-                await _context.SaveChangesAsync();
+                context.Add(genre);
+                await context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(genre);
@@ -72,7 +69,7 @@ namespace Dvdteka.Controllers
                 return NotFound();
             }
 
-            var genre = await _context.Genres.FindAsync(id);
+            var genre = await context.Genres.FindAsync(id);
             if (genre == null)
             {
                 return NotFound();
@@ -96,8 +93,8 @@ namespace Dvdteka.Controllers
             {
                 try
                 {
-                    _context.Update(genre);
-                    await _context.SaveChangesAsync();
+                    context.Update(genre);
+                    await context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -123,7 +120,7 @@ namespace Dvdteka.Controllers
                 return NotFound();
             }
 
-            var genre = await _context.Genres
+            var genre = await context.Genres
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (genre == null)
             {
@@ -138,15 +135,15 @@ namespace Dvdteka.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var genre = await _context.Genres.FindAsync(id);
-            _context.Genres.Remove(genre);
-            await _context.SaveChangesAsync();
+            var genre = await context.Genres.FindAsync(id);
+            context.Genres.Remove(genre);
+            await context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool GenreExists(int id)
         {
-            return _context.Genres.Any(e => e.Id == id);
+            return context.Genres.Any(e => e.Id == id);
         }
     }
 }
