@@ -24,7 +24,7 @@
                 @foreach (var item in Model.TopMembers)
                 {
                     <tr>
-                        <td>@item.MemberName</td>
+                        <td> <a asp-controller="Members" asp-action="Details" asp-route-id="@item.MemberId"> @item.MemberName </a> </td>
                         <td>@item.Sum.ToString("C")</td>
                     </tr>
                 }
@@ -51,7 +51,7 @@
                 @foreach (var item in Model.TopDvds)
                 {
                     <tr>
-                        <td>@item.DvdName</td>
+                        <td> <a asp-controller="Dvds" asp-action="Details" asp-route-id="@item.DvdId"> @item.DvdName </a> </td>
                         <td>@item.TimesRented</td>
                     </tr>
                 }
